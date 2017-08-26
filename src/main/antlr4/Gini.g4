@@ -183,6 +183,61 @@ BinaryExponentIndicator
 	:	[pP]
 	;
 
+BooleanLiteral
+	:	'true'
+	|	'false'
+	;
+
+CharacterLiteral
+	:	'\'' SingleCharacter '\''
+	|	'\'' EscapeSequence '\''
+	;
+
+fragment
+SingleCharacter
+	:	~['\\\r\n]
+	;
+
+
+StringLiteral
+	:	'"' StringCharacters? '"'
+	;
+
+fragment
+StringCharacters
+	:	StringCharacter+
+	;
+
+fragment
+StringCharacter
+	:	~["\\\r\n]
+	|	EscapeSequence
+	;
+
+fragment
+EscapeSequence
+	:	'\\' [btnfr"'\\]
+    |   UnicodeEscape // This is not in the spec but prevents having to preprocess the input
+	;
+
+
+fragment
+ZeroToThree
+	:	[0-3]
+	;
+
+// This is not in the spec but prevents having to preprocess the input
+fragment
+UnicodeEscape
+    :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
+    ;
+
+// §3.10.7 The Null Literal
+
+NullLiteral
+	:	'null'
+	;
+
 Identifier
 	:	IdentifierStart IdentifierPart*
 	;
