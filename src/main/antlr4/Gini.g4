@@ -16,8 +16,17 @@ For     :   'for';
 Struct  :   'struct';
 Class   :   'class';
 Type    :   'type';
-
-
+Break   :   'break';
+Continue:   'continue';
+Yield   :   'yield';
+Enum    :   'enum';
+Match   :   'match';
+Case    :   'case';
+Private :   'private';
+Import  :   'import';
+Module  :   'module';
+Union   :   'union';
+Return  :   'return';
 
 
 IntegerLiteral
