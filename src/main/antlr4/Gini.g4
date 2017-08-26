@@ -5,6 +5,20 @@ identifier  :   Identifier
     ;
 
 
+Let     :   'let';
+Mutable :   'mutable';
+If      :   'if';
+Else    :   'else';
+Fun     :   'fun';
+Where   :   'where';
+While   :   'while';
+For     :   'for';
+Struct  :   'struct';
+Class   :   'class';
+Type    :   'type';
+
+
+
 
 IntegerLiteral
 	:	DecimalIntegerLiteral
@@ -30,7 +44,14 @@ BinaryIntegerLiteral
 
 fragment
 IntegerTypeSuffix
-	:	[lL]
+	:	'i8'
+	|   'i16'
+	|   'i32'
+	|   'i64'
+	|   'u8'
+	|   'u16'
+	|   'u32'
+	|   'u64'
 	;
 
 fragment
@@ -226,13 +247,10 @@ ZeroToThree
 	:	[0-3]
 	;
 
-// This is not in the spec but prevents having to preprocess the input
 fragment
 UnicodeEscape
     :   '\\' 'u' HexDigit HexDigit HexDigit HexDigit
     ;
-
-// §3.10.7 The Null Literal
 
 NullLiteral
 	:	'null'
