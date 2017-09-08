@@ -1,12 +1,72 @@
 grammar Gini;
 
-identifier  :   Identifier
-    |   OneNL
+@lexer::members {
+    java.util.LinkedList<Character> stack = new java.util.LinkedList<>();
+}
+
+giniFile
+    :   preamble
+    ;
+
+preamble
+    :    moudleHeader? useHeader*
+    ;
+
+moudleHeader
+    :   Module ambiguousName NLS
+    ;
+
+useHeader
+    :   Use ambiguousName NLS
     ;
 
 
+toplevelDeclaration
+    :   structDeclaration
+    ;
+
+structDeclaration
+    :   Struct NLS? '{' NLS?  structElements? NLS? '}' NLS?
+    ;
+
+structElements
+    :   structElement (NL? ',' NLS? structElement)*
+    ;
+
+structElement
+    :   Identifier ':' NL? type
+    ;
+
+type
+    :   ambiguousName                   #SimpleType
+    |   '(' type ')'                    #AtomType
+    |   type '[' expr? ']'              #ArrayType
+    |   type Const? '*'                 #PointerType
+    |   '(' types? ')' '->' type        #DelegateType
+    |   Fun '(' types? ')' '->' type    #FunctionType
+    |   Any                             #TopType
+    |   Nothing                         #BottomType
+    |   Unit                            #UnitType
+    ;
+
+types
+    :   type (',' type)*
+    ;
+
+expr
+    :   ambiguousName
+    ;
+
+ambiguousName
+	:	Identifier
+	|	ambiguousName '.' Identifier
+	;
+
+
+As      :   'as';
+Any     :   'any';
+Const   :   'const';
 Let     :   'let';
-Mutable :   'mutable';
 If      :   'if';
 Else    :   'else';
 Fun     :   'fun';
@@ -23,12 +83,63 @@ Enum    :   'enum';
 Match   :   'match';
 Case    :   'case';
 Private :   'private';
-Import  :   'import';
+Use     :   'Use';
 Module  :   'module';
 Union   :   'union';
+Unit    :   'unit';
 Return  :   'return';
+Nothing :   'nothing';
+New     :   'new';
 
+LPAREN : '(' { stack.push('(');};
+RPAREN : ')' { if(stack.peek() == '(') stack.pop();};
+LBRACE : '{' { stack.push('{');};
+RBRACE : '}' { if(stack.peek() == '{') stack.pop();};
+LBRACK : '[' { stack.push('【');};
+RBRACK : ']' { if(stack.peek() == '[') stack.pop();};
+COMMA : ',';
+DOT : '.';
 
+ASSIGN : '=';
+GT : '>';
+LT : '<';
+BANG : '!';
+TILDE : '~';
+QUESTION : '?';
+COLON : ':';
+EQUAL : '==';
+LE : '<=';
+GE : '>=';
+NOTEQUAL : '!=';
+AND : '&&';
+OR : '||';
+INC : '++';
+DEC : '--';
+ADD : '+';
+SUB : '-';
+MUL : '*';
+DIV : '/';
+BITAND : '&';
+BITOR : '|';
+CARET : '^';
+MOD : '%';
+ARROW : '->';
+COLONCOLON : '::';
+
+ADD_ASSIGN : '+=';
+SUB_ASSIGN : '-=';
+MUL_ASSIGN : '*=';
+DIV_ASSIGN : '/=';
+AND_ASSIGN : '&=';
+OR_ASSIGN : '|=';
+XOR_ASSIGN : '^=';
+MOD_ASSIGN : '%=';
+LSHIFT_ASSIGN : '<<=';
+RSHIFT_ASSIGN : '>>=';
+URSHIFT_ASSIGN : '>>>=';
+
+AT : '@';
+ELLIPSIS : '...';
 
 
 IntegerLiteral
@@ -191,7 +302,9 @@ Sign
 
 fragment
 FloatTypeSuffix
-	:	[fFdD]
+	:   'f32'
+	|   'f64'
+    |   [fFdD]
 	;
 
 fragment
@@ -215,7 +328,7 @@ BinaryExponentIndicator
 	:	[pP]
 	;
 
-BooleanLiteral
+BoolLiteral
 	:	'true'
 	|	'false'
 	;
@@ -233,7 +346,15 @@ SingleCharacter
 
 StringLiteral
 	:	'"' StringCharacters? '"'
+	|   '`' .*? '`'
 	;
+
+fragment
+StringTypePrefix
+    :   'u8'
+    |   'u16'
+    |   'u32'
+    ;
 
 fragment
 StringCharacters
@@ -250,12 +371,6 @@ fragment
 EscapeSequence
 	:	'\\' [btnfr"'\\]
     |   UnicodeEscape // This is not in the spec but prevents having to preprocess the input
-	;
-
-
-fragment
-ZeroToThree
-	:	[0-3]
 	;
 
 fragment
@@ -289,16 +404,19 @@ IdentifierPart
 		{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
 	;
 
-NL  :   OneNL+
+NLS  :   NL+
     ;
 
-OneNL
-    :   '\r\n'
+NL  :   '\r\n'
     |   '\n'
     |   '\r'
     ;
 
 WS  :   [ \t] -> skip
+    ;
+
+IgnoreNL
+    :   NL { stack.peek() == '(' || stack.peek() == '['}? -> skip
     ;
 
 Comment
