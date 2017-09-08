@@ -5,7 +5,7 @@ grammar Gini;
 }
 
 giniFile
-    :   preamble
+    :   preamble toplevelDeclaration* EOF
     ;
 
 preamble
@@ -13,11 +13,11 @@ preamble
     ;
 
 moudleHeader
-    :   Module ambiguousName NLS
+    :   Module ambiguousName
     ;
 
 useHeader
-    :   Use ambiguousName NLS
+    :   Use ambiguousName
     ;
 
 
@@ -26,15 +26,15 @@ toplevelDeclaration
     ;
 
 structDeclaration
-    :   Struct NLS? '{' NLS?  structElements? NLS? '}' NLS?
+    :   Struct Identifier  '{'   structElements?  '}'
     ;
 
 structElements
-    :   structElement (NL? ',' NLS? structElement)*
+    :   structElement (','  structElement)*
     ;
 
 structElement
-    :   Identifier ':' NL? type
+    :   Identifier ':' type
     ;
 
 type
@@ -44,6 +44,7 @@ type
     |   type Const? '*'                 #PointerType
     |   '(' types? ')' '->' type        #DelegateType
     |   Fun '(' types? ')' '->' type    #FunctionType
+    |   IntegerTypes                    #IntegerType
     |   Any                             #TopType
     |   Nothing                         #BottomType
     |   Unit                            #UnitType
@@ -90,6 +91,15 @@ Unit    :   'unit';
 Return  :   'return';
 Nothing :   'nothing';
 New     :   'new';
+
+Int8        :   'i8';
+Int16       :   'i16';
+Int32       :   'i32';
+Int64       :   'i64';
+Uint8       :   'u8';
+Uint16      :   'u16';
+Uint32      :   'u32';
+Uint64      :   'u64';
 
 LPAREN : '(' { stack.push('(');};
 RPAREN : ')' { if(stack.peek() == '(') stack.pop();};
@@ -164,8 +174,11 @@ BinaryIntegerLiteral
 	:	BinaryNumeral IntegerTypeSuffix?
 	;
 
-fragment
 IntegerTypeSuffix
+    :   IntegerTypes
+    ;
+
+IntegerTypes
 	:	'i8'
 	|   'i16'
 	|   'i32'
@@ -404,19 +417,8 @@ IdentifierPart
 		{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
 	;
 
-NLS  :   NL+
-    ;
 
-NL  :   '\r\n'
-    |   '\n'
-    |   '\r'
-    ;
-
-WS  :   [ \t] -> skip
-    ;
-
-IgnoreNL
-    :   NL { stack.peek() == '(' || stack.peek() == '['}? -> skip
+WS  :   [ \t\r\n] -> skip
     ;
 
 Comment
