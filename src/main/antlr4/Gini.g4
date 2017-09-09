@@ -13,11 +13,11 @@ preamble
     ;
 
 moudleHeader
-    :   Module ambiguousName
+    :   Module ambiguousName SEMI
     ;
 
 useHeader
-    :   Use ambiguousName
+    :   Use ambiguousName SEMI
     ;
 
 
@@ -30,21 +30,21 @@ structDeclaration
     ;
 
 structElements
-    :   structElement (','  structElement)*
+    :   structElement*
     ;
 
 structElement
-    :   Identifier ':' type
+    :   Identifier ':' type SEMI
     ;
 
 type
-    :   ambiguousName                   #SimpleType
+    :   integerTypes                    #IntegerType
+    |   ambiguousName                   #SimpleType
     |   '(' type ')'                    #AtomType
     |   type '[' expr? ']'              #ArrayType
     |   type Const? '*'                 #PointerType
     |   '(' types? ')' '->' type        #DelegateType
     |   Fun '(' types? ')' '->' type    #FunctionType
-    |   IntegerTypes                    #IntegerType
     |   Any                             #TopType
     |   Nothing                         #BottomType
     |   Unit                            #UnitType
@@ -52,6 +52,17 @@ type
 
 types
     :   type (',' type)*
+    ;
+
+integerTypes
+    :   I8
+    |   I16
+    |   I32
+    |   I64
+    |   U8
+    |   U16
+    |   U32
+    |   U64
     ;
 
 expr
@@ -66,19 +77,19 @@ ambiguousName
 
 As      :   'as';
 Any     :   'any';
+Break   :   'break';
+Class   :   'class';
 Const   :   'const';
-Let     :   'let';
-If      :   'if';
+Continue:   'continue';
 Else    :   'else';
 Fun     :   'fun';
+Let     :   'let';
+If      :   'if';
 Where   :   'where';
 While   :   'while';
 For     :   'for';
 Struct  :   'struct';
-Class   :   'class';
 Type    :   'type';
-Break   :   'break';
-Continue:   'continue';
 Yield   :   'yield';
 Enum    :   'enum';
 Match   :   'match';
@@ -92,21 +103,24 @@ Return  :   'return';
 Nothing :   'nothing';
 New     :   'new';
 
-Int8        :   'i8';
-Int16       :   'i16';
-Int32       :   'i32';
-Int64       :   'i64';
-Uint8       :   'u8';
-Uint16      :   'u16';
-Uint32      :   'u32';
-Uint64      :   'u64';
+I8      :   'i8';
+I16     :   'i16';
+I32     :   'i32';
+I64     :   'i64';
+U8      :   'u8';
+U16     :   'u16';
+U32     :   'u32';
+U64     :   'u64';
 
-LPAREN : '(' { stack.push('(');};
-RPAREN : ')' { if(stack.peek() == '(') stack.pop();};
-LBRACE : '{' { stack.push('{');};
-RBRACE : '}' { if(stack.peek() == '{') stack.pop();};
-LBRACK : '[' { stack.push('【');};
-RBRACK : ']' { if(stack.peek() == '[') stack.pop();};
+F32     :   'f32';
+F64     :   'f64';
+
+LPAREN : '(';
+RPAREN : ')';
+LBRACE : '{';
+RBRACE : '}';
+LBRACK : '[';
+RBRACK : ']';
 COMMA : ',';
 DOT : '.';
 
@@ -175,19 +189,15 @@ BinaryIntegerLiteral
 	;
 
 IntegerTypeSuffix
-    :   IntegerTypes
+    :   I8
+    |   I16
+    |   I32
+    |   I64
+    |   U8
+    |   U16
+    |   U32
+    |   U64
     ;
-
-IntegerTypes
-	:	'i8'
-	|   'i16'
-	|   'i32'
-	|   'i64'
-	|   'u8'
-	|   'u16'
-	|   'u32'
-	|   'u64'
-	;
 
 fragment
 DecimalNumeral
@@ -364,9 +374,9 @@ StringLiteral
 
 fragment
 StringTypePrefix
-    :   'u8'
-    |   'u16'
-    |   'u32'
+    :   U8
+    |   U16
+    |   U32
     ;
 
 fragment
@@ -419,6 +429,10 @@ IdentifierPart
 
 
 WS  :   [ \t\r\n] -> skip
+    ;
+
+SEMI
+    : ';'
     ;
 
 Comment
