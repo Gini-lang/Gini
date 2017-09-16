@@ -1,87 +1,13 @@
-grammar Gini;
+lexer grammar GiniLexer;
 
-@lexer::members {
-    java.util.LinkedList<Character> stack = new java.util.LinkedList<>();
-}
-
-giniFile
-    :   preamble toplevelDeclaration* EOF
-    ;
-
-preamble
-    :    moudleHeader? useHeader*
-    ;
-
-moudleHeader
-    :   Module ambiguousName SEMI
-    ;
-
-useHeader
-    :   Use ambiguousName SEMI
-    ;
-
-
-toplevelDeclaration
-    :   structDeclaration
-    ;
-
-structDeclaration
-    :   Struct Identifier  '{'   structElements?  '}'
-    ;
-
-structElements
-    :   structElement*
-    ;
-
-structElement
-    :   Identifier ':' type SEMI
-    ;
-
-type
-    :   integerTypes                    #IntegerType
-    |   ambiguousName                   #SimpleType
-    |   '(' type ')'                    #AtomType
-    |   type '[' expr? ']'              #ArrayType
-    |   type Const? '*'                 #PointerType
-    |   '(' types? ')' '->' type        #DelegateType
-    |   Fun '(' types? ')' '->' type    #FunctionType
-    |   Any                             #TopType
-    |   Nothing                         #BottomType
-    |   Unit                            #UnitType
-    ;
-
-types
-    :   type (',' type)*
-    ;
-
-integerTypes
-    :   I8
-    |   I16
-    |   I32
-    |   I64
-    |   U8
-    |   U16
-    |   U32
-    |   U64
-    ;
-
-expr
-    :   ambiguousName
-    ;
-
-ambiguousName
-	:	Identifier
-	|	ambiguousName '.' Identifier
-	;
-
-
-As      :   'as';
 Any     :   'any';
+As      :   'as';
 Break   :   'break';
 Class   :   'class';
 Const   :   'const';
 Continue:   'continue';
 Else    :   'else';
+Enum    :   'enum';
 Fun     :   'fun';
 Let     :   'let';
 If      :   'if';
@@ -91,7 +17,6 @@ For     :   'for';
 Struct  :   'struct';
 Type    :   'type';
 Yield   :   'yield';
-Enum    :   'enum';
 Match   :   'match';
 Case    :   'case';
 Private :   'private';
@@ -158,13 +83,11 @@ AND_ASSIGN : '&=';
 OR_ASSIGN : '|=';
 XOR_ASSIGN : '^=';
 MOD_ASSIGN : '%=';
-LSHIFT_ASSIGN : '<<=';
-RSHIFT_ASSIGN : '>>=';
-URSHIFT_ASSIGN : '>>>=';
 
 AT : '@';
 ELLIPSIS : '...';
 
+// IntegerLiteral
 
 IntegerLiteral
 	:	DecimalIntegerLiteral
@@ -188,6 +111,7 @@ BinaryIntegerLiteral
 	:	BinaryNumeral IntegerTypeSuffix?
 	;
 
+fragment
 IntegerTypeSuffix
     :   I8
     |   I16
@@ -290,6 +214,7 @@ BinaryDigitOrUnderscore
 	|	'_'
 	;
 
+// FloatingPointLiteral
 FloatingPointLiteral
 	:	DecimalFloatingPointLiteral
 	|	HexadecimalFloatingPointLiteral
@@ -325,8 +250,8 @@ Sign
 
 fragment
 FloatTypeSuffix
-	:   'f32'
-	|   'f64'
+	:   F32
+	|   F64
     |   [fFdD]
 	;
 
@@ -366,6 +291,7 @@ SingleCharacter
 	:	~['\\\r\n]
 	;
 
+// StringLiteral
 
 StringLiteral
 	:	'"' StringCharacters? '"'
@@ -393,7 +319,7 @@ StringCharacter
 fragment
 EscapeSequence
 	:	'\\' [btnfr"'\\]
-    |   UnicodeEscape // This is not in the spec but prevents having to preprocess the input
+    |   UnicodeEscape
 	;
 
 fragment
@@ -405,6 +331,7 @@ NullLiteral
 	:	'null'
 	;
 
+//Identifier
 Identifier
 	:	IdentifierStart IdentifierPart*
 	;
@@ -426,6 +353,7 @@ IdentifierPart
 	|	[\uD800-\uDBFF] [\uDC00-\uDFFF]
 		{Character.isJavaIdentifierPart(Character.toCodePoint((char)_input.LA(-2), (char)_input.LA(-1)))}?
 	;
+
 
 
 WS  :   [ \t\r\n] -> skip
