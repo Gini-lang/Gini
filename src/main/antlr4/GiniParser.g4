@@ -41,7 +41,15 @@ structElement
 
 // function
 functionDeclaration
-    :   Fun Identifier '(' ')' //TODO
+    :   'private'? Fun Identifier '(' functionArgs ')' //TODO
+    ;
+
+
+
+functionModifier
+    :   'private' 'inline'?
+    |   externModifier 'inline'?
+    |   'inline'
     ;
 
 statement
@@ -49,14 +57,19 @@ statement
     |   Let variableModifiers Identifier ('=' )     #LocalVariableDeclarationStatement
     ;
 
-
 expr
     :   Identifier                      #ValueExpr
     |   expr '.' Identifier             #GetFieldExpr
     |   Identifier '(' ')'           #FunctionInvokeExpr
     ;
 
+functionArgs
+    :   functionArg*
+    ;
 
+functionArg
+    :   variableModifiers Identifier ':' type
+    ;
 
 // type
 type
@@ -93,16 +106,7 @@ floatTypes
     |   F64
     ;
 
-functionArgs
-    :
-    ;
-
-functionArg
-    :   variableModifiers Identifier
-    ;
-
 //Base
-
 ambiguousName
 	:	Identifier
 	|	ambiguousName '.' Identifier
@@ -110,4 +114,8 @@ ambiguousName
 
 variableModifiers
     :   Const?
+    ;
+
+externModifier
+    :   'extern' ('(' StringLiteral ')')?
     ;
