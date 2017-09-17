@@ -8,14 +8,14 @@ giniFile
 
 // Header
 preamble
-    :    moudleDeclaration? useDeclaration*
+    :    moudleHeader? useHeader*
     ;
 
-moudleDeclaration
+moudleHeader
     :   Module ambiguousName SEMI
     ;
 
-useDeclaration
+useHeader
     :   Use ambiguousName SEMI
     |   Use Module ambiguousName
     ;
