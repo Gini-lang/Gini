@@ -6,19 +6,21 @@ giniFile
     :   preamble toplevelDeclaration* EOF
     ;
 
+// Header
 preamble
-    :    moudleHeader? useHeader*
+    :    moudleDeclaration? useDeclaration*
     ;
 
-moudleHeader
+moudleDeclaration
     :   Module ambiguousName SEMI
     ;
 
-useHeader
+useDeclaration
     :   Use ambiguousName SEMI
+    |   Use Module ambiguousName
     ;
 
-
+// Body
 toplevelDeclaration
     :   structDeclaration
     |   functionDeclaration
@@ -42,12 +44,18 @@ functionDeclaration
     :   Fun Identifier '(' ')' //TODO
     ;
 
-//expr
+statement
+    :   expr SEMI                                   #ExprStatement
+    |   Let variableModifiers Identifier ('=' )     #LocalVariableDeclarationStatement
+    ;
+
+
 expr
     :   Identifier                      #ValueExpr
     |   expr '.' Identifier             #GetFieldExpr
     |   Identifier '(' ')'           #FunctionInvokeExpr
     ;
+
 
 
 // type
