@@ -17,3 +17,5 @@ libraryDependencies += "io.vavr" % "vavr" % "0.9.0"
 
 // https://mvnrepository.com/artifact/io.vavr/vavr-match
 libraryDependencies += "io.vavr" % "vavr-match" % "0.9.0"
+
+libraryDependencies += "org.bytedeco.javacpp-presets" % "llvm-platform" % "3.9.0-1.3"
