@@ -7,6 +7,10 @@ package org.glavo.gini;
  * @since 0.1.0
  */
 public class Main {
+	public void f(Main this) {
+
+	}
+
 	public static void main(String[] args) {
 
 	}
